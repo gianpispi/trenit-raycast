@@ -5,6 +5,12 @@
 
 Italian Rail departure information.
 
+## Commands
+
+| name                  | description                                                                                                                                               |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Check Trains Status` | Select a train station to check the status of your train.                                                                                                 |
+
 ## Screenshot
 https://github.com/user-attachments/assets/90b43666-e2f9-4779-b4a8-f521ef1c26d9
 
