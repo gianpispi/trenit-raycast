@@ -1,27 +1,104 @@
-import { ActionPanel, List, Action, Icon } from "@raycast/api";
+import { ActionPanel, Color, List, Action, Icon, LocalStorage, showToast, Toast } from "@raycast/api";
 import { getStations } from "./api/stations-service";
 import { StationView } from "./station-view";
 
+import { useState, useEffect } from "react";
+
 const stations = getStations();
 
+function StationItem({ station, toggleFavorite, isFavorite = false }: {
+  station: { id: string; name: string };
+  toggleFavorite: (id: string) => void;
+  isFavorite?: boolean;
+}) {
+  return (
+    <List.Item
+      key={station.id}
+      title={station.name}
+      icon={isFavorite ? { source: Icon.Star, tintColor: Color.Yellow } : undefined}
+      actions={
+        <ActionPanel>
+          <Action.Push title="Show trains" target={<StationView station={station} />} icon={Icon.Train} />
+          <Action
+            title={isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+            shortcut={{ modifiers: ["opt"], key: "a" }}
+            icon={Icon.Star}
+            onAction={() => toggleFavorite(station.id)}
+          />
+        </ActionPanel>
+      }
+    />
+  );
+}
+
 export default function Command() {
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [sortedStations, setSortedStations] = useState<{ favorites: any[]; others: any[] }>({
+    favorites: [],
+    others: [],
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true);
+      try {
+        const storedFavorites = await LocalStorage.getItem<string>("favorites");
+        const favoriteIds = storedFavorites ? JSON.parse(storedFavorites) : [];
+
+        const favoriteStations = stations.filter((station) => favoriteIds.includes(station.id));
+        const otherStations = stations.filter((station) => !favoriteIds.includes(station.id));
+
+        setFavorites(favoriteIds);
+        setSortedStations({ favorites: favoriteStations, others: otherStations });
+      } catch (error) {
+        console.error("Error loading favorites:", error);
+        showToast({ style: Toast.Style.Failure, title: "Failed to load favorites" });
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, []);
+
+  const toggleFavorite = async (id: string) => {
+    const isFavorite = favorites.includes(id);
+    const updatedFavorites = isFavorite
+      ? favorites.filter((favId) => favId !== id)
+      : [...favorites, id];
+
+    const updatedFavoriteStations = stations.filter((station) => updatedFavorites.includes(station.id));
+    const updatedOtherStations = stations.filter((station) => !updatedFavorites.includes(station.id));
+
+    setFavorites(updatedFavorites);
+    setSortedStations({ favorites: updatedFavoriteStations, others: updatedOtherStations });
+    await LocalStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+  
+    await showToast({
+      style: Toast.Style.Success,
+      title: isFavorite ? "Removed from Favorites" : "Added to Favorites",
+    });
+  };
+
+  const { favorites: favoriteStations, others: otherStations } = sortedStations;
+
   return (
     <List
       searchBarPlaceholder="Search for a train station"
       navigationTitle="Select station"
+      isLoading={isLoading}
     >
-      {stations.map((station) => (
-        <List.Item
-          key={station.id}
-          title={station.name}
-          actions={
-            <ActionPanel>
-              <Action.Push title="Show trains" target={<StationView station={station} />} icon={Icon.Train} />
-              <Action autoFocus={true} title="Favourite station" shortcut={{ modifiers: ["opt"], key: "a" }} icon={Icon.Star} />
-            </ActionPanel>
-          }
-        />
-      ))}
+      {favoriteStations.length > 0 && 
+        <List.Section title="Favorite Stations">
+          {favoriteStations.map((station) => (
+            <StationItem station={station} toggleFavorite={toggleFavorite} isFavorite />
+          ))}
+        </List.Section>
+      }
+      <List.Section title="Stations">
+        {otherStations.map((station) => (
+          <StationItem station={station} toggleFavorite={toggleFavorite} />
+        ))}
+      </List.Section>
     </List>
   );
 }
