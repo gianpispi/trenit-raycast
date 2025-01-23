@@ -4,7 +4,7 @@
   "title": "Trenit",
   "description": "Italian Rail departure information",
   "icon": "extension-icon.png",
-  "author": "gianpiero_spinelli",
+  "author": "gianpispi",
   "categories": [
     "Other"
   ],
@@ -12,10 +12,11 @@
   "commands": [
     {
       "name": "departures-and-arrivals",
-      "title": "Departures and arrivals",
-      "subtitle": "Select a train station to check train status",
+      "title": "Check train status",
+      "subtitle": "Select a train station to check the status of your train",
       "description": "Lets you browse the trains status throughout Italian stations.",
-      "mode": "view"
+      "mode": "view",
+      "handle": "stations"
     }
   ],
   "dependencies": {
