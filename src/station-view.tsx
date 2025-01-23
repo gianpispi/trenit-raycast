@@ -22,10 +22,6 @@ export function StationView(props: {
 }) {
   const [direction, setDirection] = useState("false");
 
-  const onDrinkTypeChange = (newValue: string) => {
-    setDirection(newValue);
-  };
-
   const { isLoading: isLoading, data: trains, revalidate } = useFetch(getUrl(props.station.id, direction), {
     parseResponse(response) {
       return response.text().then(parseTrains);
@@ -47,7 +43,7 @@ export function StationView(props: {
   return (
     <List
       navigationTitle={`${props.station.name} station`}
-      searchBarAccessory={<DirectionDropdown onSelectionChange={onDrinkTypeChange} />}
+      searchBarAccessory={<DirectionDropdown onSelectionChange={setDirection} />}
       isLoading={isLoading}
       isShowingDetail={!(!trains || trains.length === 0)}
     >
