@@ -12,7 +12,7 @@
   "commands": [
     {
       "name": "departures-and-arrivals",
-      "title": "Check train status",
+      "title": "Check Trains Status",
       "subtitle": "Select a train station to check the status of your train",
       "description": "Lets you browse the trains status throughout Italian stations.",
       "mode": "view",
