@@ -1,5 +1,4 @@
 import { ActionPanel, Color, List, Action, Icon, LocalStorage, showToast, Toast } from "@raycast/api";
-import { createDeeplink } from "@raycast/utils";
 import { getStations } from "./api/stations-service";
 import { StationView } from "./station-view";
 import { Station } from "./models/station";
@@ -8,7 +7,11 @@ import { useState, useEffect } from "react";
 
 const stations = getStations();
 
-function StationItem({ station, toggleFavorite, isFavorite = false }: {
+function StationItem({
+  station,
+  toggleFavorite,
+  isFavorite = false,
+}: {
   station: Station;
   toggleFavorite: (id: string) => void;
   isFavorite?: boolean;
@@ -19,7 +22,7 @@ function StationItem({ station, toggleFavorite, isFavorite = false }: {
       icon={isFavorite ? { source: Icon.Star, tintColor: Color.Yellow } : undefined}
       actions={
         <ActionPanel>
-          <Action.Push title="Show trains" target={<StationView station={station} />} icon={Icon.Train} />
+          <Action.Push title="Show Trains" target={<StationView station={station} />} icon={Icon.Train} />
           <Action
             title={isFavorite ? "Remove from Favorites" : "Add to Favorites"}
             shortcut={{ modifiers: ["ctrl"], key: "a" }}
@@ -34,7 +37,7 @@ function StationItem({ station, toggleFavorite, isFavorite = false }: {
 
 export default function Command() {
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [sortedStations, setSortedStations] = useState<{ favorites: any[]; others: any[] }>({
+  const [sortedStations, setSortedStations] = useState<{ favorites: Station[]; others: Station[] }>({
     favorites: [],
     others: [],
   });
@@ -63,9 +66,7 @@ export default function Command() {
 
   const toggleFavorite = async (id: string) => {
     const isFavorite = favorites.includes(id);
-    const updatedFavorites = isFavorite
-      ? favorites.filter((favId) => favId !== id)
-      : [...favorites, id];
+    const updatedFavorites = isFavorite ? favorites.filter((favId) => favId !== id) : [...favorites, id];
 
     const updatedFavoriteStations = stations.filter((station) => updatedFavorites.includes(station.id));
     const updatedOtherStations = stations.filter((station) => !updatedFavorites.includes(station.id));
@@ -73,7 +74,7 @@ export default function Command() {
     setFavorites(updatedFavorites);
     setSortedStations({ favorites: updatedFavoriteStations, others: updatedOtherStations });
     await LocalStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-  
+
     await showToast({
       style: Toast.Style.Success,
       title: isFavorite ? "Removed from Favorites" : "Added to Favorites",
@@ -83,18 +84,14 @@ export default function Command() {
   const { favorites: favoriteStations, others: otherStations } = sortedStations;
 
   return (
-    <List
-      searchBarPlaceholder="Search for a train station"
-      navigationTitle="Select station"
-      isLoading={isLoading}
-    >
-      {favoriteStations.length > 0 && 
+    <List searchBarPlaceholder="Search for a train station" navigationTitle="Select station" isLoading={isLoading}>
+      {favoriteStations.length > 0 && (
         <List.Section title="Favorite Stations">
           {favoriteStations.map((station) => (
             <StationItem key={station.id} station={station} toggleFavorite={toggleFavorite} isFavorite />
           ))}
         </List.Section>
-      }
+      )}
       <List.Section title="Stations">
         {otherStations.map((station) => (
           <StationItem key={station.id} station={station} toggleFavorite={toggleFavorite} />
@@ -103,4 +100,3 @@ export default function Command() {
     </List>
   );
 }
-

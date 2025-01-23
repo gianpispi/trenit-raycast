@@ -17,17 +17,19 @@ function getAccessory(train: Train) {
   }
 }
 
-export function StationView(props: {
-  station: Station;
-}) {
+export function StationView(props: { station: Station }) {
   const [direction, setDirection] = useState("false");
 
-  const { isLoading: isLoading, data: trains, revalidate } = useFetch(getUrl(props.station.id, direction), {
+  const {
+    isLoading: isLoading,
+    data: trains,
+    revalidate,
+  } = useFetch(getUrl(props.station.id, direction), {
     parseResponse(response) {
       return response.text().then(parseTrains);
     },
     mapResult(result) {
-      return {data: mapTrains(result)}
+      return { data: mapTrains(result) };
     },
     onError(error) {
       (async () => {
@@ -36,8 +38,8 @@ export function StationView(props: {
           title: `Could not load trains for ${props.station.name}`,
           message: error.toString(),
         });
-      })()
-    }
+      })();
+    },
   });
 
   return (
@@ -48,13 +50,18 @@ export function StationView(props: {
       isShowingDetail={!(!trains || trains.length === 0)}
     >
       {!trains || trains.length === 0 ? (
-        <List.EmptyView 
-          title="No trains found" 
+        <List.EmptyView
+          title="No trains found"
           actions={
             <ActionPanel>
-              <Action autoFocus={false} title="Refresh" onAction={revalidate} shortcut={{ modifiers: ["opt"], key: "l" }} />
+              <Action
+                autoFocus={false}
+                title="Refresh"
+                onAction={revalidate}
+                shortcut={{ modifiers: ["opt"], key: "l" }}
+              />
             </ActionPanel>
-          } 
+          }
         />
       ) : (
         trains.map((train) => (
@@ -63,31 +70,40 @@ export function StationView(props: {
             title={train.time}
             subtitle={`${train.destination} - ${train.number}`}
             keywords={[train.number, train.destination, train.time]}
-            accessories={[
-              getAccessory(train)
-            ]}
+            accessories={[getAccessory(train)]}
             icon={train.icon ? `${train.icon}.svg` : Icon.Train}
             detail={
-              <List.Item.Detail 
+              <List.Item.Detail
                 metadata={
                   <List.Item.Detail.Metadata>
                     <List.Item.Detail.Metadata.TagList title={`${train.destination} - ${train.number}`}>
-                      {train.isDelayed && <List.Item.Detail.Metadata.TagList.Item text={train.delay} color={Color.Red} />}
-                      {train.isBlinking && <List.Item.Detail.Metadata.TagList.Item text="Departing now" color={Color.Blue} />}
+                      {train.isDelayed && (
+                        <List.Item.Detail.Metadata.TagList.Item text={train.delay} color={Color.Red} />
+                      )}
+                      {train.isBlinking && (
+                        <List.Item.Detail.Metadata.TagList.Item text="Departing now" color={Color.Blue} />
+                      )}
                     </List.Item.Detail.Metadata.TagList>
 
                     <List.Item.Detail.Metadata.Label title="Info" />
                     <List.Item.Detail.Metadata.Label title="Original time" text={train.time} />
                     <List.Item.Detail.Metadata.Label title="Platform" text={train.platform} />
                     <List.Item.Detail.Metadata.Label title="Train" text={`${train.carrier} ${train.number}`} />
-                    {train.isReplacedByBus && <List.Item.Detail.Metadata.Label title="This train is replaced by a bus" />}
+                    {train.isReplacedByBus && (
+                      <List.Item.Detail.Metadata.Label title="This train is replaced by a bus" />
+                    )}
                   </List.Item.Detail.Metadata>
                 }
               />
             }
             actions={
               <ActionPanel>
-                <Action autoFocus={false} title="Refresh" onAction={revalidate} shortcut={{ modifiers: ["opt"], key: "l" }} />
+                <Action
+                  autoFocus={false}
+                  title="Refresh"
+                  onAction={revalidate}
+                  shortcut={{ modifiers: ["opt"], key: "l" }}
+                />
               </ActionPanel>
             }
           />
