@@ -48,11 +48,14 @@ export function StationView(props: {
       isShowingDetail={!(!trains || trains.length === 0)}
     >
       {!trains || trains.length === 0 ? (
-        <List.EmptyView icon={{ source: "https://http.cat/100" }} title="Type something to get started" actions={
-          <ActionPanel>
-            <Action autoFocus={false} title="Refresh" onAction={revalidate} shortcut={{ modifiers: ["opt"], key: "l" }} />
-          </ActionPanel>
-        } />
+        <List.EmptyView 
+          title="No trains found" 
+          actions={
+            <ActionPanel>
+              <Action autoFocus={false} title="Refresh" onAction={revalidate} shortcut={{ modifiers: ["opt"], key: "l" }} />
+            </ActionPanel>
+          } 
+        />
       ) : (
         trains.map((train) => (
           <List.Item

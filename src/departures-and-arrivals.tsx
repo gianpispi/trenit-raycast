@@ -1,19 +1,20 @@
 import { ActionPanel, Color, List, Action, Icon, LocalStorage, showToast, Toast } from "@raycast/api";
+import { createDeeplink } from "@raycast/utils";
 import { getStations } from "./api/stations-service";
 import { StationView } from "./station-view";
+import { Station } from "./models/station";
 
 import { useState, useEffect } from "react";
 
 const stations = getStations();
 
 function StationItem({ station, toggleFavorite, isFavorite = false }: {
-  station: { id: string; name: string };
+  station: Station;
   toggleFavorite: (id: string) => void;
   isFavorite?: boolean;
 }) {
   return (
     <List.Item
-      key={station.id}
       title={station.name}
       icon={isFavorite ? { source: Icon.Star, tintColor: Color.Yellow } : undefined}
       actions={
@@ -21,7 +22,7 @@ function StationItem({ station, toggleFavorite, isFavorite = false }: {
           <Action.Push title="Show trains" target={<StationView station={station} />} icon={Icon.Train} />
           <Action
             title={isFavorite ? "Remove from Favorites" : "Add to Favorites"}
-            shortcut={{ modifiers: ["opt"], key: "a" }}
+            shortcut={{ modifiers: ["ctrl"], key: "a" }}
             icon={Icon.Star}
             onAction={() => toggleFavorite(station.id)}
           />
@@ -90,13 +91,13 @@ export default function Command() {
       {favoriteStations.length > 0 && 
         <List.Section title="Favorite Stations">
           {favoriteStations.map((station) => (
-            <StationItem station={station} toggleFavorite={toggleFavorite} isFavorite />
+            <StationItem key={station.id} station={station} toggleFavorite={toggleFavorite} isFavorite />
           ))}
         </List.Section>
       }
       <List.Section title="Stations">
         {otherStations.map((station) => (
-          <StationItem station={station} toggleFavorite={toggleFavorite} />
+          <StationItem key={station.id} station={station} toggleFavorite={toggleFavorite} />
         ))}
       </List.Section>
     </List>
