@@ -58,7 +58,6 @@ function fixCategory(category: string): string {
 
 function categoryToIcon(category: string): string | null {
 	category = category.toLowerCase();
-	console.log(category);
 	if (category.includes('autocorsa')) {
 		return 'bus';
 	} else if (category.includes('regionale veloce')) {

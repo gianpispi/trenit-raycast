@@ -1,23 +1,11 @@
-import { ActionPanel, List, Action, Icon, Toast, showToast, Detail, Color } from "@raycast/api";
+import { ActionPanel, List, Action, Icon, Toast, showToast, Color } from "@raycast/api";
 import { useState } from "react";
 import { useFetch } from "@raycast/utils";
-import { Station } from "./api/stations-service";
 import { parseTrains } from "./api/rfi-api";
-import { mapTrains, Train, getUrl } from "./api/trains-service";
-
-function DrinkDropdown(props: { onSelectionChange: (newValue: string) => void }) {
-  return (
-    <List.Dropdown
-      filtering={false}
-      tooltip="Select Direction"
-      storeValue={true}
-      onChange={props.onSelectionChange}
-    >
-      <List.Dropdown.Item key="arrivals" title="Arrivals" value="true" />
-      <List.Dropdown.Item key="departures" title="Departures" value="false" />
-    </List.Dropdown>
-  );
-}
+import { mapTrains, getUrl } from "./api/trains-service";
+import { Train } from "./models/train";
+import { Station } from "./models/station";
+import { DirectionDropdown } from "./components/direction-dropdown";
 
 function getAccessory(train: Train) {
   if (train.isBlinking) {
@@ -46,7 +34,6 @@ export function StationView(props: {
       return {data: mapTrains(result)}
     },
     onError(error) {
-      // setIsLoading(false);
       (async () => {
         await showToast({
           style: Toast.Style.Failure,
@@ -57,29 +44,10 @@ export function StationView(props: {
     }
   });
 
-  if (isLoading) {
-    return (
-      <Detail isLoading={isLoading} markdown={`## Loading ${props.station.name}...`} />
-
-      // <List.Item
-      //   title={`Translating to ${props.station.name}...`}
-      //   accessories={[
-      //     {
-      //       text: `${props.station.id}`
-      //     },
-      //   ]}
-      // />
-    );
-  }
-
-  console.log(trains);
-
   return (
-    // <Detail markdown={`## Stazione di ${props.station.name}`} />
-
     <List
       navigationTitle={`${props.station.name} station`}
-      searchBarAccessory={<DrinkDropdown onSelectionChange={onDrinkTypeChange} />}
+      searchBarAccessory={<DirectionDropdown onSelectionChange={onDrinkTypeChange} />}
       isLoading={isLoading}
       isShowingDetail={!(!trains || trains.length === 0)}
     >
@@ -91,8 +59,6 @@ export function StationView(props: {
         } />
       ) : (
         trains.map((train) => (
-          console.log(train.isReplacedByBus),
-
           <List.Item
             key={train.number}
             title={train.time}
