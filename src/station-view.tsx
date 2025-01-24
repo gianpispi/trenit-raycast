@@ -106,7 +106,9 @@ export function StationView(props: { station: Station }) {
                     {train.isReplacedByBus && (
                       <List.Item.Detail.Metadata.Label title="This train is replaced by a bus" />
                     )}
-                    {train.isIncomplete && <List.Item.Detail.Metadata.Label title="⚠️ The details on this canceled train are temporarily not available (the train could be replaced by bus)." />}
+                    {train.isIncomplete && (
+                      <List.Item.Detail.Metadata.Label title="⚠️ The details on this canceled train are temporarily not available (the train could be replaced by bus)." />
+                    )}
                   </List.Item.Detail.Metadata>
                 }
               />
