@@ -124,7 +124,7 @@ export function StationView(props: { station: Station }) {
                     </List.Item.Detail.Metadata.TagList>
 
                     <List.Item.Detail.Metadata.Label title="Info" />
-                    <List.Item.Detail.Metadata.Label title="Original time" text={train.time} />
+                    <List.Item.Detail.Metadata.Label title="Scheduled departure" text={train.time} />
                     <List.Item.Detail.Metadata.Label title="Platform" text={train.platform} />
                     <List.Item.Detail.Metadata.Label title="Train" text={`${train.carrier} ${train.number}`} />
                     {train.isReplacedByBus && (
