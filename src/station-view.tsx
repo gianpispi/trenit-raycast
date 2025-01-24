@@ -139,10 +139,17 @@ export function StationView(props: { station: Station }) {
             }
             actions={
               <ActionPanel>
+                <Action.CopyToClipboard
+                  title="Copy Train Info"
+                  content={`Train to ${train.destination} (${train.number}), with scheduled departure at ${train.time} from platform ${train.platform}, ${train.isDelayed ? `delayed by ${train.delay} minutes` : "on time"}`}
+                  icon={Icon.CopyClipboard}
+                  shortcut={{ modifiers: ["cmd"], key: "c" }}
+                />
                 <Action
                   autoFocus={false}
                   title="Refresh"
                   onAction={revalidate}
+                  icon={Icon.RotateClockwise}
                   shortcut={{ modifiers: ["opt"], key: "l" }}
                 />
               </ActionPanel>
