@@ -57,7 +57,7 @@ export function StationView(props: { station: Station }) {
       });
       return { data: mapTrains(result) };
     },
-    onError(_error) {
+    onError() {
       displayToast({
         title: "Could Not Load Information",
         style: Toast.Style.Failure,
