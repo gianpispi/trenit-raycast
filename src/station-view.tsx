@@ -17,6 +17,24 @@ function getAccessory(train: Train, icon: string) {
   }
 }
 
+function displayToast({
+  title,
+  style,
+  primaryAction = undefined,
+}: {
+  title: string;
+  style: Toast.Style;
+  primaryAction?: Toast.ActionOptions;
+}) {
+  (async () => {
+    await showToast({
+      style: style,
+      title: title,
+      primaryAction: primaryAction,
+    });
+  })();
+}
+
 export function StationView(props: { station: Station }) {
   const [direction, setDirection] = useState("false");
 
@@ -25,20 +43,26 @@ export function StationView(props: { station: Station }) {
     data: trains,
     revalidate,
   } = useFetch(getUrl(props.station.id, direction), {
+    onWillExecute() {
+      displayToast({ title: "Loading Data", style: Toast.Style.Animated });
+    },
     parseResponse(response) {
       return response.text().then(parseTrains);
     },
     mapResult(result) {
+      displayToast({
+        title: "Trains Loaded",
+        style: Toast.Style.Success,
+        primaryAction: { title: "Try Again", onAction: revalidate },
+      });
       return { data: mapTrains(result) };
     },
-    onError(error) {
-      (async () => {
-        await showToast({
-          style: Toast.Style.Failure,
-          title: `Could not load trains for ${props.station.name}`,
-          message: error.toString(),
-        });
-      })();
+    onError(_error) {
+      displayToast({
+        title: "Could Not Load Information",
+        style: Toast.Style.Failure,
+        primaryAction: { title: "Try Again", onAction: revalidate },
+      });
     },
   });
 
